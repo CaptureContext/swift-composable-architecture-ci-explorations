@@ -56,20 +56,20 @@ jobs:
       - name: Debug
         uses: capturecontext/swift-package-action@1.0
         with:
-          - command: xcodebuild
-          - subcommand: ${{ matrix.command }}
-          - platform: ${{ matrix.platform }}
-          - scheme: ComposableArchitecture
-          - config: Debug
+          command: xcodebuild
+          subcommand: ${{ matrix.command }}
+          platform: ${{ matrix.platform }}
+          scheme: ComposableArchitecture
+          config: Debug
       - name: Release
         if: matrix.skip_release != '1'
         uses: capturecontext/swift-package-action@1.0
         with:
-          - command: xcodebuild
-          - subcommand: ${{ matrix.command }}
-          - platform: ${{ matrix.platform }}
-          - scheme: ComposableArchitecture
-          - config: Release
+          command: xcodebuild
+          subcommand: ${{ matrix.command }}
+          platform: ${{ matrix.platform }}
+          scheme: ComposableArchitecture
+          config: Release
 
   library-evolution:
     name: Library (evolution)
@@ -81,8 +81,8 @@ jobs:
       - name: Build for library evolution
         uses: capturecontext/swift-package-action@1.0
         with:
-          - command: build-for-library-evolution
-          - scheme: ComposableArchitecture
+          command: build-for-library-evolution
+          scheme: ComposableArchitecture
 
   examples:
     name: Examples
@@ -106,48 +106,48 @@ jobs:
       - name: CaseStudies (SwiftUI)
         uses: capturecontext/swift-package-action@1.0
         with:
-          - command: test-example
-          - scheme: CaseStudies (SwiftUI)
-          - platform: iOS
+          command: test-example
+          scheme: CaseStudies (SwiftUI)
+          platform: iOS
       - name: CaseStudies (UIKit)
         uses: capturecontext/swift-package-action@1.0
         with:
-          - command: test-example
-          - scheme: CaseStudies (UIKit)
-          - platform: iOS
+          command: test-example
+          scheme: CaseStudies (UIKit)
+          platform: iOS
       - name: Search
         uses: capturecontext/swift-package-action@1.0
         with:
-          - command: test-example
-          - scheme: Search
-          - platform: iOS
+          command: test-example
+          scheme: Search
+          platform: iOS
       - name: SyncUps
         uses: capturecontext/swift-package-action@1.0
         with:
-          - command: test-example
-          - scheme: SyncUps
-          - platform: iOS
+          command: test-example
+          scheme: SyncUps
+          platform: iOS
       - name: SpeechRecognition
         uses: capturecontext/swift-package-action@1.0
         with:
-          - command: test-example
-          - scheme: SpeechRecognition
-          - platform: iOS
+          command: test-example
+          scheme: SpeechRecognition
+          platform: iOS
       - name: TicTacToe
         uses: capturecontext/swift-package-action@1.0
         with:
-          - command: test-example
-          - scheme: TicTacToe
-          - platform: iOS
+          command: test-example
+          scheme: TicTacToe
+          platform: iOS
       - name: Todos
         uses: capturecontext/swift-package-action@1.0
         with:
-          - command: test-example
-          - scheme: Todos
-          - platform: iOS
+          command: test-example
+          scheme: Todos
+          platform: iOS
       - name: VoiceMemos
         uses: capturecontext/swift-package-action@1.0
         with:
-          - command: test-example
-          - scheme: VoiceMemos
-          - platform: iOS
+          command: test-example
+          scheme: VoiceMemos
+          platform: iOS
