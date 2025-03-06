@@ -32,7 +32,7 @@ jobs:
           command: xcodebuild
           subcommand: ${{ matrix.command }}
           platform: ${{ matrix.platform }}
-          workspace: '.github/package.xcworkspace'
+          workspace: .github/package.xcworkspace
           scheme: ComposableArchitecture
           config: Debug
 
@@ -63,7 +63,7 @@ jobs:
           command: xcodebuild
           subcommand: ${{ matrix.command }}
           platform: ${{ matrix.platform }}
-          workspace: '.github/package.xcworkspace'
+          workspace: .github/package.xcworkspace
           scheme: ComposableArchitecture
           config: Debug
       - name: Release
@@ -75,7 +75,7 @@ jobs:
           command: xcodebuild
           subcommand: ${{ matrix.command }}
           platform: ${{ matrix.platform }}
-          workspace: '.github/package.xcworkspace'
+          workspace: .github/package.xcworkspace
           scheme: ComposableArchitecture
           config: Release
 
@@ -93,7 +93,7 @@ jobs:
 
   examples:
     name: Examples
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - name: CaseStudies (SwiftUI)
@@ -101,6 +101,7 @@ jobs:
         with:
           command: xcodebuild-raw
           cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
           scheme: CaseStudies (SwiftUI)
           platform: iOS
       - name: CaseStudies (UIKit)
@@ -108,6 +109,7 @@ jobs:
         with:
           command: xcodebuild-raw
           cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
           scheme: CaseStudies (UIKit)
           platform: iOS
       - name: Search
@@ -115,6 +117,7 @@ jobs:
         with:
           command: xcodebuild-raw
           cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
           scheme: Search
           platform: iOS
       - name: SyncUps
@@ -122,6 +125,7 @@ jobs:
         with:
           command: xcodebuild-raw
           cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
           scheme: SyncUps
           platform: iOS
       - name: SpeechRecognition
@@ -129,6 +133,7 @@ jobs:
         with:
           command: xcodebuild-raw
           cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
           scheme: SpeechRecognition
           platform: iOS
       - name: TicTacToe
@@ -136,6 +141,7 @@ jobs:
         with:
           command: xcodebuild-raw
           cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
           scheme: TicTacToe
           platform: iOS
       - name: Todos
@@ -143,6 +149,7 @@ jobs:
         with:
           command: xcodebuild-raw
           cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
           scheme: Todos
           platform: iOS
       - name: VoiceMemos
@@ -150,6 +157,7 @@ jobs:
         with:
           command: xcodebuild-raw
           cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
           scheme: VoiceMemos
           platform: iOS
 
