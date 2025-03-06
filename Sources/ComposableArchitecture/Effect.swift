@@ -1,10 +1,10 @@
-import Combine
+@preconcurrency import Combine
 import Foundation
 import SwiftUI
 
-public struct Effect<Action> {
+public struct Effect<Action>: Sendable {
   @usableFromInline
-  enum Operation {
+  enum Operation: Sendable {
     case none
     case publisher(AnyPublisher<Action, Never>)
     case run(TaskPriority? = nil, @Sendable (_ send: Send<Action>) async -> Void)
@@ -46,11 +46,11 @@ extension Effect {
 
   /// Wraps an asynchronous unit of work that can emit actions any number of times in an effect.
   ///
-  /// For example, if you had an async stream in a dependency client:
+  /// For example, if you had an async sequence in a dependency client:
   ///
   /// ```swift
   /// struct EventsClient {
-  ///   var events: () -> AsyncStream<Event>
+  ///   var events: () -> any AsyncSequence<Event, Never>
   /// }
   /// ```
   ///
@@ -77,8 +77,12 @@ extension Effect {
   ///   - priority: Priority of the underlying task. If `nil`, the priority will come from
   ///     `Task.currentPriority`.
   ///   - operation: The operation to execute.
-  ///   - catch: An error handler, invoked if the operation throws an error other than
+  ///   - handler: An error handler, invoked if the operation throws an error other than
   ///     `CancellationError`.
+  ///   - fileID: The fileID.
+  ///   - filePath: The filePath.
+  ///   - line: The line.
+  ///   - column: The column.
   /// - Returns: An effect wrapping the given asynchronous work.
   public static func run(
     priority: TaskPriority? = nil,

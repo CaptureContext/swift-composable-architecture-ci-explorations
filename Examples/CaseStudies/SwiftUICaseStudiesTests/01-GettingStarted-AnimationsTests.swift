@@ -1,14 +1,16 @@
 import Clocks
 import ComposableArchitecture
-import XCTest
+import Testing
 
 @testable import SwiftUICaseStudies
 
-final class AnimationTests: XCTestCase {
-  func testRainbow() async {
+@MainActor
+struct AnimationTests {
+  @Test
+  func rainbow() async {
     let clock = TestClock()
 
-    let store = await TestStore(initialState: Animations.State()) {
+    let store = TestStore(initialState: Animations.State()) {
       Animations()
     } withDependencies: {
       $0.continuousClock = clock
@@ -54,13 +56,14 @@ final class AnimationTests: XCTestCase {
       $0.circleColor = .black
     }
 
-    await clock.run()
+    await clock.run(timeout: .seconds(7))
   }
 
-  func testReset() async {
+  @Test
+  func reset() async {
     let clock = TestClock()
 
-    let store = await TestStore(initialState: Animations.State()) {
+    let store = TestStore(initialState: Animations.State()) {
       Animations()
     } withDependencies: {
       $0.continuousClock = clock
