@@ -20,29 +20,21 @@ jobs:
     strategy:
       matrix:
         command: [test, '']
-        platform: [IOS, MACOS]
+        platform: [iOS, macOS]
         xcode: ['16.2']
     steps:
       - uses: actions/checkout@v4
-      - name: Select Xcode ${{ matrix.xcode }}
-        run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
-      - name: List available devices
-        run: xcrun simctl list devices available
-      - name: Cache derived data
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.derivedData
-          key: |
-            deriveddata-xcodebuild-${{ matrix.platform }}-${{ matrix.xcode }}-${{ matrix.command }}-${{ hashFiles('**/Sources/**/*.swift', '**/Tests/**/*.swift') }}
-          restore-keys: |
-            deriveddata-xcodebuild-${{ matrix.platform }}-${{ matrix.xcode }}-${{ matrix.command }}-
-      - name: Set IgnoreFileSystemDeviceInodeChanges flag
-        run: defaults write com.apple.dt.XCBuild IgnoreFileSystemDeviceInodeChanges -bool YES
-      - name: Update mtime for incremental builds
-        uses: chetan/git-restore-mtime-action@v2
       - name: Debug
-        run: make XCODEBUILD_ARGUMENT="${{ matrix.command }}" CONFIG=Debug PLATFORM="${{ matrix.platform }}" WORKSPACE=.github/package.xcworkspace xcodebuild
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          xcode: ${{ matrix.xcode }}
+          cache-derived-data: true
+          command: xcodebuild
+          subcommand: ${{ matrix.command }}
+          platform: ${{ matrix.platform }}
+          workspace: .github/package.xcworkspace
+          scheme: ComposableArchitecture
+          config: Debug
 
   xcodebuild:
     name: xcodebuild (15)
@@ -50,7 +42,7 @@ jobs:
     strategy:
       matrix:
         command: [test, '']
-        platform: [IOS, MAC_CATALYST, MACOS, TVOS, VISIONOS, WATCHOS]
+        platform: [iOS, macOS, macCatalyst, tvOS, visionOS, watchOS]
         xcode: [15.2, 15.4]
         exclude:
           - {xcode: 15.2, command: test}
@@ -63,81 +55,111 @@ jobs:
           - {xcode: 15.2, skip_release: 1}
     steps:
       - uses: actions/checkout@v4
-      - name: Select Xcode ${{ matrix.xcode }}
-        run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
-      - name: Install visionOS runtime
-        if: matrix.platform == 'visionOS'
-        run: |
-          sudo xcodebuild -runFirstLaunch
-          sudo xcrun simctl list
-          sudo xcodebuild -downloadPlatform visionOS
-          sudo xcodebuild -runFirstLaunch
-      - name: List available devices
-        run: xcrun simctl list devices available
-      - name: Cache derived data
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.derivedData
-          key: |
-            deriveddata-xcodebuild-${{ matrix.platform }}-${{ matrix.xcode }}-${{ matrix.command }}-${{ hashFiles('**/Sources/**/*.swift', '**/Tests/**/*.swift') }}
-          restore-keys: |
-            deriveddata-xcodebuild-${{ matrix.platform }}-${{ matrix.xcode }}-${{ matrix.command }}-
-      - name: Set IgnoreFileSystemDeviceInodeChanges flag
-        run: defaults write com.apple.dt.XCBuild IgnoreFileSystemDeviceInodeChanges -bool YES
-      - name: Update mtime for incremental builds
-        uses: chetan/git-restore-mtime-action@v2
       - name: Debug
-        run: make XCODEBUILD_ARGUMENT="${{ matrix.command }}" CONFIG=Debug PLATFORM="${{ matrix.platform }}" WORKSPACE=.github/package.xcworkspace xcodebuild
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          xcode: ${{ matrix.xcode }}
+          cache-derived-data: true
+          command: xcodebuild
+          subcommand: ${{ matrix.command }}
+          platform: ${{ matrix.platform }}
+          workspace: .github/package.xcworkspace
+          scheme: ComposableArchitecture
+          config: Debug
       - name: Release
         if: matrix.skip_release != '1'
-        run: make XCODEBUILD_ARGUMENT="${{ matrix.command }}" CONFIG=Release PLATFORM="${{ matrix.platform }}" WORKSPACE=.github/package.xcworkspace xcodebuild
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          xcode: ${{ matrix.xcode }}
+          cache-derived-data: true
+          command: xcodebuild
+          subcommand: ${{ matrix.command }}
+          platform: ${{ matrix.platform }}
+          workspace: .github/package.xcworkspace
+          scheme: ComposableArchitecture
+          config: Release
 
   library-evolution:
     name: Library (evolution)
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
-      - name: Select Xcode 15.4
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app
       - name: Build for library evolution
-        run: make build-for-library-evolution
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          xcode: 15.4
+          command: build-for-library-evolution
+          scheme: ComposableArchitecture
 
   examples:
     name: Examples
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - name: Cache derived data
-        uses: actions/cache@v3
-        with:
-          path: ~/.derivedData
-          key: |
-            deriveddata-examples-${{ hashFiles('**/Sources/**/*.swift', '**/Tests/**/*.swift', '**/Examples/**/*.swift') }}
-          restore-keys: |
-            deriveddata-examples-
-      - name: Select Xcode 16
-        run: sudo xcode-select -s /Applications/Xcode_16.2.app
-      - name: Set IgnoreFileSystemDeviceInodeChanges flag
-        run: defaults write com.apple.dt.XCBuild IgnoreFileSystemDeviceInodeChanges -bool YES
-      - name: Update mtime for incremental builds
-        uses: chetan/git-restore-mtime-action@v2
       - name: CaseStudies (SwiftUI)
-        run: make DERIVED_DATA_PATH=~/.derivedData SCHEME="CaseStudies (SwiftUI)" xcodebuild
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          command: xcodebuild-raw
+          cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
+          scheme: CaseStudies (SwiftUI)
+          platform: iOS
       - name: CaseStudies (UIKit)
-        run: make DERIVED_DATA_PATH=~/.derivedData SCHEME="CaseStudies (UIKit)" xcodebuild
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          command: xcodebuild-raw
+          cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
+          scheme: CaseStudies (UIKit)
+          platform: iOS
       - name: Search
-        run: make DERIVED_DATA_PATH=~/.derivedData SCHEME="Search" xcodebuild
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          command: xcodebuild-raw
+          cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
+          scheme: Search
+          platform: iOS
       - name: SyncUps
-        run: make DERIVED_DATA_PATH=~/.derivedData SCHEME="SyncUps" xcodebuild
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          command: xcodebuild-raw
+          cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
+          scheme: SyncUps
+          platform: iOS
       - name: SpeechRecognition
-        run: make DERIVED_DATA_PATH=~/.derivedData SCHEME="SpeechRecognition" xcodebuild
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          command: xcodebuild-raw
+          cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
+          scheme: SpeechRecognition
+          platform: iOS
       - name: TicTacToe
-        run: make DERIVED_DATA_PATH=~/.derivedData SCHEME="TicTacToe" xcodebuild
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          command: xcodebuild-raw
+          cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
+          scheme: TicTacToe
+          platform: iOS
       - name: Todos
-        run: make DERIVED_DATA_PATH=~/.derivedData SCHEME="Todos" xcodebuild
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          command: xcodebuild-raw
+          cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
+          scheme: Todos
+          platform: iOS
       - name: VoiceMemos
-        run: make DERIVED_DATA_PATH=~/.derivedData SCHEME="VoiceMemos" xcodebuild
+        uses: capturecontext/swift-package-action@2.0
+        with:
+          command: xcodebuild-raw
+          cache-derived-data: true
+          workspace: ComposableArchitecture.xcworkspace
+          scheme: VoiceMemos
+          platform: iOS
 
   check-macro-compatibility:
     name: Check Macro Compatibility
